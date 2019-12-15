@@ -6,31 +6,24 @@ public class Node {
 	private char character;
 	private Node left;
 	private Node right;
-	
-	public Node (char character, int frequency) {
+
+	public Node(char character, int frequency) {
 		this.character = character;
 		this.frequency = frequency;
 		this.left = this.right = null;
 	}
-	
-	public Node (char character, int frequency, Node left, Node right) {
+
+	public Node(char character, int frequency, Node left, Node right) {
 		this.character = character;
 		this.frequency = frequency;
 		this.left = left;
 		this.right = right;
 	}
 
-	public Node (int frequency, Node left, Node right) {
-		this.frequency = frequency;
-		this.left = left;
-		this.right = right;
-	}
-
-	
 	public int getFrequency() {
 		return frequency;
 	}
-	
+
 	public char getCharacter() {
 		return character;
 	}
@@ -50,10 +43,9 @@ public class Node {
 	public void setRight(Node right) {
 		this.right = right;
 	}
-	
+
 	public boolean isLeaf() {
 		return left == null && right == null;
 	}
-	
+
 }
- 

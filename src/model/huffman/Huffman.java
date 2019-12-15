@@ -8,13 +8,14 @@ import model.utility.NodeComparator;
 
 public class Huffman {
 
-	Map <Character, String> codes;
+	private Map <Character, String> codes;
+	private final char INTERNAL_NODE_CHARACTER = '™';
+	
 	
 	public Huffman() {
 		codes = new HashMap<Character, String>();
 	}
 	
-	@SuppressWarnings("null")
 	// build the Huffman tree according to the frequencies
 	private void buildHuffmanTree (HashMap<Character, Integer> frequencies) {
 		PriorityQueue<Node> queue = new PriorityQueue<Node>(frequencies.size(), new NodeComparator());
@@ -31,7 +32,7 @@ public class Huffman {
 			Node right = queue.poll();
 
 			// Create an internal node
-			Node internalNode = new Node(left.getFrequency() + right.getFrequency() , left, right);
+			Node internalNode = new Node(INTERNAL_NODE_CHARACTER ,left.getFrequency() + right.getFrequency() , left, right);
 
 			queue.add(internalNode);
 		}
@@ -46,7 +47,7 @@ public class Huffman {
 		if (root == null)
 			return;
 		
-		if (root.isLeaf() && Character.isLetter(root.getCharacter()))
+		if (root.isLeaf() && root.getCharacter() != INTERNAL_NODE_CHARACTER)
 			codes.put(root.getCharacter(), code);
 			
 		assignCodes(root.getLeft(),  code + "0");

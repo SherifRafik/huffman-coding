@@ -8,7 +8,7 @@ public class NodeComparator implements Comparator<Node> {
 
 	@Override
 	public int compare(Node firstNode, Node secondNode) {
-		return  firstNode.getFrequency() - secondNode.getFrequency();
+		return firstNode.getFrequency() - secondNode.getFrequency();
 	}
-	
+
 }

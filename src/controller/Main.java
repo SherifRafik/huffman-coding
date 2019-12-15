@@ -8,11 +8,9 @@ import model.huffman.Huffman;
 public class Main {
 
 	public static void main(String[] args) {
-		
-		
-		
+
 		HashMap<Character, Integer> frequencies = new HashMap<Character, Integer>();
-		
+
 		frequencies.put('a', 5);
 		frequencies.put('b', 9);
 		frequencies.put('c', 12);
@@ -27,7 +25,6 @@ public class Main {
 			System.out.println("Character: " + entry.getKey() + " Code: " + entry.getValue());
 		}
 
-		
 	}
 
 }
