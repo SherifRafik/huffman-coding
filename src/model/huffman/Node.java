@@ -20,6 +20,12 @@ public class Node {
 		this.right = right;
 	}
 
+	public Node(int frequency, Node left, Node right) {
+		this.frequency = frequency;
+		this.left = left;
+		this.right = right;
+	}
+
 	public int getFrequency() {
 		return frequency;
 	}
