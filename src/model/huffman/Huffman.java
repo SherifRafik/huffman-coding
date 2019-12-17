@@ -1,15 +1,10 @@
 package model.huffman;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,11 +16,12 @@ public class Huffman {
 
 	private Map<Character, String> codes;
 
+	private static final String HEADER_BODY_SEPARATOR = "!@#";
+
 	public Huffman() {
 		codes = new HashMap<Character, String>();
 	}
 
-	// build the Huffman tree according to the frequencies
 	private void buildHuffmanTree(HashMap<Character, Integer> frequencies) {
 		PriorityQueue<Node> queue = new PriorityQueue<Node>(frequencies.size(), new NodeComparator());
 
@@ -67,55 +63,31 @@ public class Huffman {
 		buildHuffmanTree(frequencies);
 	}
 
-	public void compressToFile(String inputFileName, String outputFileName) {
-		File inputFile = new File(inputFileName);
-		File outputFile = new File(outputFileName);
-
-		FileWriter fileWriter = null;
-		FileReader fileReader = null;
+	public void writeToFile(String fileContent, String outputFileName) {
 
 		try {
-			fileReader = new FileReader(inputFile);
-			fileWriter = new FileWriter(outputFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
-		BufferedReader bufferedReader = new BufferedReader(fileReader);
-		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-		writeHeader(bufferedWriter);
+			File outputFile = new File(outputFileName);
+			FileWriter fileWriter = new FileWriter(outputFile);
+			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+			FileOutputStream fout = new FileOutputStream(outputFile, true);
 
-		String encoded = "";
-		int c;
-
-		try {
-			while ((c = bufferedReader.read()) != -1) {
-				char character = (char) c;
-				encoded += (this.codes.get(character));
+			StringBuilder encoded = new StringBuilder();
+			// append all the codes to encoded
+			for (char c : fileContent.toCharArray()) {
+				encoded.append(codes.get(c));
 			}
-			// encoded += FrequencyCounter.PSEUDO_EOF;
-			// System.out.println(encoded);
+			// calculate zero padding required
 			encoded = calculateZeroPadding(encoded);
 
-			int startIndex = 0;
-			int endIndex = 8;
-			int count = 0;
-			for (int i = 0; i < encoded.length() / 8; i++) {
-				int binary = Integer.parseInt(encoded.substring(startIndex, endIndex), 2);
-				// System.out.println(binary + " " + (char)binary);
-				startIndex = endIndex;
-				endIndex += 8;
-				count++;
-				bufferedWriter.write((char) binary);
-			}
-			System.out.println(count);
+			System.out.println(encoded);
+			// Write header
+			writeHeader(bufferedWriter);
+			// Write body
+			writeBody(fout, encoded);
+			// Clear the hashmap for decoding
+			codes.clear();
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			bufferedWriter.close();
-			bufferedReader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -123,40 +95,47 @@ public class Huffman {
 	}
 
 	private void writeHeader(BufferedWriter bufferedWriter) {
-		for (Entry<Character, String> entry : codes.entrySet()) {
-			try {
-				bufferedWriter.write(entry.getKey() + " : " + entry.getValue() + System.lineSeparator());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 		try {
-			bufferedWriter.write("=" + System.lineSeparator());
+
+			for (Entry<Character, String> entry : codes.entrySet()) {
+				bufferedWriter.write(entry.getKey() + " : " + entry.getValue() + System.lineSeparator());
+			}
+
+			bufferedWriter.write(HEADER_BODY_SEPARATOR + System.lineSeparator());
+
+			bufferedWriter.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private byte[] convertToBytes(String encoded) {
-		BitSet bitSet = new BitSet(encoded.length());
-		int bitCounter = 0;
-		for (Character c : encoded.toCharArray()) {
-			if (c.equals('1')) {
-				bitSet.set(bitCounter);
-			}
-			bitCounter++;
-		}
-		return bitSet.toByteArray();
-	}
-
-	private String calculateZeroPadding(String encoded) {
+	private StringBuilder calculateZeroPadding(StringBuilder encoded) {
 		int remainder = (encoded.length()) % 8;
 		int numberOfZerosToPad = 8 - remainder;
 
 		for (int i = 0; i < numberOfZerosToPad; i++)
-			encoded += '0';
+			encoded.append('0');
 
 		return encoded;
+	}
+
+	private void writeBody(FileOutputStream fout, StringBuilder encoded) {
+		try {
+			int startIndex = 0;
+			int endIndex = 8;
+			int length = encoded.length() / 8;
+
+			for (int i = 0; i < length; i++) {
+				int binary = Integer.parseInt(encoded.substring(startIndex, endIndex), 2);
+				startIndex = endIndex;
+				endIndex += 8;
+				fout.write((char) binary);
+			}
+
+			fout.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public Map<Character, String> getCodes() {
