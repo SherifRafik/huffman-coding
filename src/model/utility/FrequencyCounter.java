@@ -34,13 +34,12 @@ public class FrequencyCounter {
 				frequencies.put(character, frequencies.get(character) + 1);
 			}
 			bufferedReader.close();
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return;
 	}
-	
-	
 
 	public String getFileContent() {
 		return fileContent.toString();

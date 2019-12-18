@@ -13,6 +13,15 @@ public class Node {
 		this.left = this.right = null;
 	}
 
+	public Node() {
+		this.left = this.right = null;
+	}
+
+	public Node(char character) {
+		this.character = character;
+		this.left = this.right = null;
+	}
+
 	public Node(char character, int frequency, Node left, Node right) {
 		this.character = character;
 		this.frequency = frequency;
