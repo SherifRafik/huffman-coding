@@ -161,11 +161,14 @@ public class Huffman {
 
 	private void writeLineSeparatorCodes(BufferedWriter bufferedWriter) {
 		try {
-			if (codes.containsKey('\n'))
+			if (codes.containsKey('\n')) {
 				bufferedWriter.write(codes.get('\n') + " ");
-			if (codes.containsKey('\r'))
-				bufferedWriter.write(codes.get('\r') + System.lineSeparator());
+			}
+			if (codes.containsKey('\r')) {
+				bufferedWriter.write(codes.get('\r'));
+			}
 
+			bufferedWriter.write(System.lineSeparator());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
