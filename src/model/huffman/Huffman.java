@@ -162,10 +162,10 @@ public class Huffman {
 	private void writeLineSeparatorCodes(BufferedWriter bufferedWriter) {
 		try {
 			if (codes.containsKey('\n')) {
-				bufferedWriter.write(codes.get('\n') + " ");
+				bufferedWriter.write(codes.get('\n'));
 			}
 			if (codes.containsKey('\r')) {
-				bufferedWriter.write(codes.get('\r'));
+				bufferedWriter.write(" " + codes.get('\r'));
 			}
 
 			bufferedWriter.write(System.lineSeparator());
@@ -212,7 +212,7 @@ public class Huffman {
 			if (lineSeparators.length == 2) {
 				decompressingCodes.put(lineSeparators[0], '\n');
 				decompressingCodes.put(lineSeparators[1], '\r');
-			} else {
+			} else if (lineSeparators.length == 1) {
 				decompressingCodes.put(lineSeparators[0], '\n');
 			}
 
@@ -242,6 +242,8 @@ public class Huffman {
 			// Convert the byte to an unsigned integer
 			int temp = fileContent[i] & 0xFF;
 			// Convert the integer into an 8 bit string and append it to the string builder
+			// I want it to take 8 place hence %8s
+			// Use .replace to ensure that it takes the 8 bits
 			content.append(String.format("%8s", Integer.toBinaryString(temp)).replace(' ', '0'));
 		}
 
@@ -257,8 +259,8 @@ public class Huffman {
 	private String decode(String fileAsBits) {
 		StringBuilder currentSequenceOfBits = new StringBuilder();
 		StringBuilder decoded = new StringBuilder();
-
-		for (int i = 0; i < fileAsBits.length(); i++) {
+		int length = fileAsBits.length();
+		for (int i = 0; i < length; i++) {
 			currentSequenceOfBits.append(fileAsBits.charAt(i));
 
 			if (decompressingCodes.containsKey(currentSequenceOfBits.toString())) {

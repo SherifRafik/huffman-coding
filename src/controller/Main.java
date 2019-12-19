@@ -21,7 +21,6 @@ public class Main {
 		Huffman huffman = new Huffman();
 
 		huffman.compress(frequencies);
-
 //		for (Entry<Character, String> entry : huffman.getCodes().entrySet()) {
 //			System.out.println("Character: " + (int) entry.getKey() + " Code: " + entry.getValue());
 //		}
