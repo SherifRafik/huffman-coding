@@ -92,6 +92,8 @@ public class Huffman {
 			int numberOfBytes = encoded.length() / 8;
 			bufferedWriter.write(numberOfBytes + " " + numberOfZerosToPad + System.lineSeparator());
 
+			writeLineSeparatorCodes(bufferedWriter);
+
 			// Write header
 			writeHeader(bufferedWriter);
 			// Write body
@@ -124,6 +126,8 @@ public class Huffman {
 		try {
 
 			for (Entry<Character, String> entry : codes.entrySet()) {
+				if (entry.getKey() == '\n' || entry.getKey() == '\r')
+					continue;
 				bufferedWriter.write(entry.getKey() + ": " + entry.getValue() + System.lineSeparator());
 			}
 
@@ -145,14 +149,27 @@ public class Huffman {
 				int binary = Integer.parseInt(encoded.substring(startIndex, endIndex), 2);
 				startIndex = endIndex;
 				endIndex += 8;
-				//System.out.println(binary);
+				// System.out.println(binary);
 				fout.write((char) binary);
 			}
-			//System.out.println("-----");
+			// System.out.println("-----");
 			fout.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void writeLineSeparatorCodes(BufferedWriter bufferedWriter) {
+		try {
+			if (codes.containsKey('\n'))
+				bufferedWriter.write(codes.get('\n') + " ");
+			if (codes.containsKey('\r'))
+				bufferedWriter.write(codes.get('\r') + System.lineSeparator());
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	public void decompress(String inputFileName, String outputFileName) {
@@ -188,21 +205,20 @@ public class Huffman {
 			numberOfBytes = Integer.parseInt(data[0]);
 			numberOfZerosToPad = Integer.parseInt(data[1]);
 
+			String[] lineSeparators = bufferedReader.readLine().split(" ");
+			if (lineSeparators.length == 2) {
+				decompressingCodes.put(lineSeparators[0], '\n');
+				decompressingCodes.put(lineSeparators[1], '\r');
+			} else {
+				decompressingCodes.put(lineSeparators[0], '\n');
+			}
+
 			// System.out.println(numberOfBytes + " " + numberOfZerosToPad);
-			boolean isLineFeed = true;
 			String line;
 			while (!((line = bufferedReader.readLine()).equals(HEADER_BODY_SEPARATOR))) {
 				String[] currentLine = line.split(": ");
 				if (currentLine.length == 2) {
-					if (currentLine[0].length() == 0) {
-						if (isLineFeed) {
-							decompressingCodes.put(currentLine[1], '\n');
-							isLineFeed = false;
-						} else {
-							decompressingCodes.put(currentLine[1], '\r');
-						}
-					} else
-						decompressingCodes.put(currentLine[1], currentLine[0].charAt(0));
+					decompressingCodes.put(currentLine[1], currentLine[0].charAt(0));
 				} else
 					continue;
 			}
@@ -231,7 +247,7 @@ public class Huffman {
 		content.append(String.format("%8s", Integer.toBinaryString(lastByte)).replace(' ', '0'));
 		int length = content.length();
 		content.delete(length - numberOfZerosToPad, length);
-		//System.out.println(content);
+		// System.out.println(content);
 		return content.toString();
 	}
 

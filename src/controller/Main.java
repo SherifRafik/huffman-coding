@@ -8,7 +8,6 @@ import model.utility.FrequencyCounter;
 public class Main {
 
 	public static void main(String[] args) {
-
 		FrequencyCounter fc = new FrequencyCounter("input.txt");
 		fc.readFile();
 
@@ -34,6 +33,7 @@ public class Main {
 //		for (Entry<Character, String> entry : huffman.getCodes().entrySet()) {
 //			System.out.println("Character: " + (int) entry.getKey() + " Frequency: " + entry.getValue());
 //		}
+		
 
 	}
 
