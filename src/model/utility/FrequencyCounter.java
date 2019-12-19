@@ -11,6 +11,7 @@ public class FrequencyCounter {
 	private HashMap<Character, Integer> frequencies;
 	private StringBuilder fileContent;
 	private String filePath;
+	private double fileSize;
 
 	public FrequencyCounter(String path) {
 		frequencies = new HashMap<Character, Integer>();
@@ -21,6 +22,7 @@ public class FrequencyCounter {
 	public void readFile() {
 		try {
 			File file = new File(filePath);
+			fileSize = file.length();
 			FileReader fileReader = null;
 			fileReader = new FileReader(file);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -48,5 +50,10 @@ public class FrequencyCounter {
 	public HashMap<Character, Integer> getFrequencies() {
 		return frequencies;
 	}
+
+	public double getFileSize() {
+		return fileSize;
+	}
+
 
 }

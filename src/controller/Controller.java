@@ -11,12 +11,14 @@ public class Controller {
 	Huffman huffman = new Huffman();
 	HashMap<Character, Integer> frequencies;
 	String fileContent;
+	double inputFileSize;
 
 	public void load(String path) {
 		FrequencyCounter fc = new FrequencyCounter(path);
 		fc.readFile();
 		frequencies = fc.getFrequencies();
 		fileContent = fc.getFileContent();
+		inputFileSize = fc.getFileSize();
 	}
 
 	public void compress() {
@@ -29,6 +31,9 @@ public class Controller {
 
 	public void saveAs(String path) {
 		huffman.compressToFile(fileContent, path);
+		double compressedFileSize = huffman.getCompressedFileSize();
+		double compressionRatio = compressedFileSize / inputFileSize;
+		System.out.println("Compression Ratio = " + compressionRatio);
 	}
 
 }

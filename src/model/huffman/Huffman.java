@@ -21,6 +21,8 @@ public class Huffman {
 	private Map<Character, String> codes;
 	private Map<String, Character> decompressingCodes;
 
+	private double compressedFileSize;
+
 	private static String HEADER_BODY_SEPARATOR = "!@";
 
 	int numberOfZerosToPad;
@@ -32,6 +34,7 @@ public class Huffman {
 
 	public void compress(HashMap<Character, Integer> frequencies) {
 		buildHuffmanTree(frequencies);
+		printTable();
 	}
 
 	private void buildHuffmanTree(HashMap<Character, Integer> frequencies) {
@@ -98,6 +101,8 @@ public class Huffman {
 			writeHeader(bufferedWriter);
 			// Write body
 			writeBody(fout, encoded);
+
+			compressedFileSize = outputFile.length();
 
 			codes.clear();
 
@@ -283,8 +288,21 @@ public class Huffman {
 		return;
 	}
 
+	private void printTable() {
+		for (Entry<Character, String> entry : codes.entrySet()) {
+			char character = entry.getKey();
+			String code = entry.getValue();
+			String binaryRepresentation = Integer.toBinaryString((int) character);
+			System.out.println("Byte: " + (int) character + " Code: " + binaryRepresentation + " New Code: " + code);
+		}
+	}
+
 	public Map<Character, String> getCodes() {
 		return codes;
+	}
+
+	public double getCompressedFileSize() {
+		return compressedFileSize;
 	}
 
 }

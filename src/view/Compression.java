@@ -75,7 +75,10 @@ public class Compression {
 	}
 
 	public void compress() {
+		long start = System.currentTimeMillis();
 		controller.compress();
+		long end = System.currentTimeMillis();
+		long timeTaken = end - start;
 		fileChooser = new FileChooser();
 		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
 		fileChooser.getExtensionFilters().add(extFilter);
@@ -84,10 +87,13 @@ public class Compression {
 		File file = fileChooser.showSaveDialog(window);
 		if (file != null) {
 			path = file.getAbsolutePath();
+			start = System.currentTimeMillis();
 			controller.saveAs(path);
+			end = System.currentTimeMillis();
+			timeTaken = timeTaken + (end - start);
 			refresh(path);
 			msgLabel.setTextFill(Color.WHITE);
-			msgLabel.setText("File compressed successfully.");
+			msgLabel.setText("File is compressed in: " + timeTaken + "ms");
 		}
 
 	}
@@ -114,9 +120,12 @@ public class Compression {
 		File outputFile = fileChooser.showSaveDialog(window);
 		if (outputFile != null) {
 			outputPath = outputFile.getAbsolutePath();
+			long start = System.currentTimeMillis();
 			controller.decompress(path, outputPath);
+			long end = System.currentTimeMillis();
+			long timeTaken = end - start;
 			msgLabel.setTextFill(Color.WHITE);
-			msgLabel.setText("File decompressed successfully.");
+			msgLabel.setText("File is decompressed in: " + timeTaken + "ms");
 		}
 
 	}
