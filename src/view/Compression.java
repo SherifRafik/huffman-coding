@@ -8,6 +8,8 @@ import controller.Controller;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -30,6 +32,8 @@ public class Compression {
 	public Button compressButton;
 	public Button decompressButton;
 	String path;
+	
+	boolean isEmpty;
 
 	public void initialize(Stage primaryStage) throws Exception {
 
@@ -45,7 +49,7 @@ public class Compression {
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add("view/darkTheme.css");
 			primaryStage.setScene(scene);
-			primaryStage.setTitle("English Huffman Compression");
+			primaryStage.setTitle("Huffman Compression");
 			primaryStage.show();
 
 		} catch (Exception e) {
@@ -67,7 +71,13 @@ public class Compression {
 		File file = fileChooser.showOpenDialog(window);
 		if (file != null) {
 			path = file.getAbsolutePath();
-			controller.load(path);
+			isEmpty = controller.load(path);
+			if (!isEmpty) {
+		        Alert alert = new Alert(AlertType.ERROR);
+		        alert.setContentText("Empty File"); 
+		        alert.show();
+			}
+				
 			refresh(path);
 			msgLabel.setTextFill(Color.WHITE);
 			msgLabel.setText("File loaded successfuly.");
@@ -75,6 +85,9 @@ public class Compression {
 	}
 
 	public void compress() {
+		if (!isEmpty) {
+			return;
+		}
 		long start = System.currentTimeMillis();
 		controller.compress();
 		long end = System.currentTimeMillis();
@@ -88,12 +101,19 @@ public class Compression {
 		if (file != null) {
 			path = file.getAbsolutePath();
 			start = System.currentTimeMillis();
-			controller.saveAs(path);
+			double compressionRatio = controller.saveAs(path);
+			if (compressionRatio == -1) {
+		        Alert alert = new Alert(AlertType.ERROR);
+		        alert.setContentText("Input file is too small for compression"); 
+		        alert.show();
+		        return;
+			}
 			end = System.currentTimeMillis();
 			timeTaken = timeTaken + (end - start);
 			refresh(path);
 			msgLabel.setTextFill(Color.WHITE);
-			msgLabel.setText("File is compressed in: " + timeTaken + "ms");
+			msgLabel.setText("File is compressed in: " + timeTaken + "ms" + System.lineSeparator() 
+			+ "Compression Ratio = " + compressionRatio);
 		}
 
 	}

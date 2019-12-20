@@ -25,11 +25,14 @@ public class Huffman {
 
 	private static String HEADER_BODY_SEPARATOR = "!@";
 
+	private boolean isCompressable;
+
 	int numberOfZerosToPad;
 
 	public Huffman() {
 		codes = new HashMap<Character, String>();
 		decompressingCodes = new HashMap<String, Character>();
+		isCompressable = true;
 	}
 
 	public void compress(HashMap<Character, Integer> frequencies) {
@@ -78,11 +81,6 @@ public class Huffman {
 
 		try {
 
-			File outputFile = new File(outputFileName);
-			FileWriter fileWriter = new FileWriter(outputFile);
-			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-			FileOutputStream fout = new FileOutputStream(outputFile, true);
-
 			StringBuilder encoded = new StringBuilder();
 			// append all the codes to encoded
 			for (char c : fileContent.toCharArray()) {
@@ -93,23 +91,64 @@ public class Huffman {
 			encoded = calculateZeroPadding(encoded);
 
 			int numberOfBytes = encoded.length() / 8;
-			bufferedWriter.write(numberOfBytes + " " + numberOfZerosToPad + System.lineSeparator());
 
-			writeLineSeparatorCodes(bufferedWriter);
+			int headerSize = calculateHeaderSize(numberOfBytes);
 
-			// Write header
-			writeHeader(bufferedWriter);
-			// Write body
-			writeBody(fout, encoded);
+			int lengthOfInputFile = fileContent.length();
+			if (headerSize + numberOfBytes > lengthOfInputFile) {
+				isCompressable = false;
+			}
 
-			compressedFileSize = outputFile.length();
+			if (isCompressable) {
+				File outputFile = new File(outputFileName);
+				FileWriter fileWriter = new FileWriter(outputFile);
+				BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+				FileOutputStream fout = new FileOutputStream(outputFile, true);
 
-			codes.clear();
+				bufferedWriter.write(numberOfBytes + " " + numberOfZerosToPad + System.lineSeparator());
+				writeLineSeparatorCodes(bufferedWriter);
+				// Write header
+				writeHeader(bufferedWriter);
+				// Write body
+				writeBody(fout, encoded);
+				compressedFileSize = outputFile.length();
+				codes.clear();
+			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
+	}
+
+	private int calculateHeaderSize(int numberOfBytes) {
+		int headerSize = 0;
+		int numberOfDigits = String.valueOf(numberOfBytes).length();
+		// First line in the header contains numberOfbytes + space + numberOfPaddedZeros
+		// + \r\n
+		headerSize = headerSize + numberOfDigits + 1 + 1 + 2;
+
+		// Second line in the header contains the code of the new line + space +
+		// carriage return + \r\n
+		if (codes.containsKey('\n'))
+			headerSize += codes.get('\n').length();
+		if (codes.containsKey('\r'))
+			headerSize = headerSize + 1 + codes.get('\r').length();
+
+		headerSize += 2;
+
+		// Character + : + space + code
+
+		for (Entry<Character, String> entry : codes.entrySet()) {
+			if (entry.getKey() == '\n' || entry.getKey() == '\r')
+				continue;
+			headerSize = headerSize + 5 + entry.getValue().length();
+		}
+
+		// Header_body separator
+		headerSize += 4;
+
+		return headerSize;
 	}
 
 	private StringBuilder calculateZeroPadding(StringBuilder encoded) {
@@ -151,7 +190,7 @@ public class Huffman {
 			int length = encoded.length() / 8;
 
 			for (int i = 0; i < length; i++) {
-				int binary = Integer.parseInt(encoded.substring(startIndex, endIndex), 2);
+				byte binary = (byte) Integer.parseInt(encoded.substring(startIndex, endIndex), 2);
 				startIndex = endIndex;
 				endIndex += 8;
 				// System.out.println(binary);
@@ -303,6 +342,10 @@ public class Huffman {
 
 	public double getCompressedFileSize() {
 		return compressedFileSize;
+	}
+
+	public boolean isCompressable() {
+		return isCompressable;
 	}
 
 }

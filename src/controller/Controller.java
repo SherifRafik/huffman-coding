@@ -13,27 +13,37 @@ public class Controller {
 	String fileContent;
 	double inputFileSize;
 
-	public void load(String path) {
+	public boolean load(String path) {
 		FrequencyCounter fc = new FrequencyCounter(path);
 		fc.readFile();
 		frequencies = fc.getFrequencies();
+		if (frequencies.size() == 0)
+			return false;
 		fileContent = fc.getFileContent();
 		inputFileSize = fc.getFileSize();
+		return true;
 	}
 
 	public void compress() {
 		huffman.compress(frequencies);
+		frequencies.clear();
 	}
 
 	public void decompress(String inputFilePath, String outputFilePath) {
 		huffman.decompress(inputFilePath, outputFilePath);
 	}
 
-	public void saveAs(String path) {
+	public double saveAs(String path) {
 		huffman.compressToFile(fileContent, path);
+		double compressionRatio;
+		boolean isCompressable = huffman.isCompressable();
+		if (!isCompressable) {
+			compressionRatio = -1; // Compression failed
+			return compressionRatio;
+		}
 		double compressedFileSize = huffman.getCompressedFileSize();
-		double compressionRatio = compressedFileSize / inputFileSize;
-		System.out.println("Compression Ratio = " + compressionRatio);
+		compressionRatio = compressedFileSize / inputFileSize;
+		return compressionRatio;
 	}
 
 }
