@@ -101,14 +101,13 @@ public class Huffman {
 
 			if (isCompressable) {
 				File outputFile = new File(outputFileName);
-				FileWriter fileWriter = new FileWriter(outputFile);
-				BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-				FileOutputStream fout = new FileOutputStream(outputFile, true);
+				FileOutputStream fout = new FileOutputStream(outputFile);
 
-				bufferedWriter.write(numberOfBytes + " " + numberOfZerosToPad + System.lineSeparator());
-				writeLineSeparatorCodes(bufferedWriter);
+				String firstLine = numberOfBytes + " " + numberOfZerosToPad + System.lineSeparator();
+				fout.write(firstLine.getBytes(), 0, firstLine.length());
+				writeLineSeparatorCodes(fout);
 				// Write header
-				writeHeader(bufferedWriter);
+				writeHeader(fout);
 				// Write body
 				writeBody(fout, encoded);
 				compressedFileSize = outputFile.length();
@@ -166,18 +165,21 @@ public class Huffman {
 		return encoded;
 	}
 
-	private void writeHeader(BufferedWriter bufferedWriter) {
+	private void writeHeader(FileOutputStream fout) {
 		try {
-
+			String line;
 			for (Entry<Character, String> entry : codes.entrySet()) {
 				if (entry.getKey() == '\n' || entry.getKey() == '\r')
 					continue;
-				bufferedWriter.write(entry.getKey() + ": " + entry.getValue() + System.lineSeparator());
+				char character = (char)(entry.getKey());
+				fout.write(character);
+				line = ": " + entry.getValue() + System.lineSeparator();
+				fout.write(line.getBytes(), 0, line.length());
 			}
 
-			bufferedWriter.write(HEADER_BODY_SEPARATOR + System.lineSeparator());
+			String headerEnd = HEADER_BODY_SEPARATOR + System.lineSeparator();
+			fout.write(headerEnd.getBytes(), 0, headerEnd.length());
 
-			bufferedWriter.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -203,16 +205,20 @@ public class Huffman {
 		}
 	}
 
-	private void writeLineSeparatorCodes(BufferedWriter bufferedWriter) {
+	private void writeLineSeparatorCodes(FileOutputStream fout) {
 		try {
+			String code;
 			if (codes.containsKey('\n')) {
-				bufferedWriter.write(codes.get('\n'));
+				code = codes.get('\n');
+				fout.write(code.getBytes(), 0, code.length());
 			}
 			if (codes.containsKey('\r')) {
-				bufferedWriter.write(" " + codes.get('\r'));
+				code = " ";
+				code += codes.get('\r');
+				fout.write(code.getBytes(), 0, code.length());
 			}
-
-			bufferedWriter.write(System.lineSeparator());
+			String separatorCodesEnd = System.lineSeparator();
+			fout.write(separatorCodesEnd.getBytes(), 0, separatorCodesEnd.length());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

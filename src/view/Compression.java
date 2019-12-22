@@ -34,6 +34,9 @@ public class Compression {
 	String path;
 	
 	boolean isEmpty;
+	
+	private long timeTaken;
+
 
 	public void initialize(Stage primaryStage) throws Exception {
 
@@ -64,14 +67,15 @@ public class Compression {
 	public void load() {
 
 		fileChooser = new FileChooser();
-		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
-		fileChooser.getExtensionFilters().add(extFilter);
 		String currentPath = Paths.get(".").toAbsolutePath().normalize().toString() + "/src/resources";
 		fileChooser.setInitialDirectory(new File(currentPath));
 		File file = fileChooser.showOpenDialog(window);
 		if (file != null) {
 			path = file.getAbsolutePath();
+			long start = System.currentTimeMillis();
 			isEmpty = controller.load(path);
+			long end = System.currentTimeMillis();
+			timeTaken = end - start;
 			if (!isEmpty) {
 		        Alert alert = new Alert(AlertType.ERROR);
 		        alert.setContentText("Empty File"); 
@@ -91,10 +95,8 @@ public class Compression {
 		long start = System.currentTimeMillis();
 		controller.compress();
 		long end = System.currentTimeMillis();
-		long timeTaken = end - start;
+		timeTaken = timeTaken + (end - start);
 		fileChooser = new FileChooser();
-		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
-		fileChooser.getExtensionFilters().add(extFilter);
 		String currentPath = Paths.get(".").toAbsolutePath().normalize().toString() + "/src/resources";
 		fileChooser.setInitialDirectory(new File(currentPath));
 		File file = fileChooser.showSaveDialog(window);
@@ -102,14 +104,14 @@ public class Compression {
 			path = file.getAbsolutePath();
 			start = System.currentTimeMillis();
 			double compressionRatio = controller.saveAs(path);
+			end = System.currentTimeMillis();
+			timeTaken = timeTaken + (end - start);
 			if (compressionRatio == -1) {
 		        Alert alert = new Alert(AlertType.ERROR);
 		        alert.setContentText("Input file is too small for compression"); 
 		        alert.show();
 		        return;
 			}
-			end = System.currentTimeMillis();
-			timeTaken = timeTaken + (end - start);
 			refresh(path);
 			msgLabel.setTextFill(Color.WHITE);
 			msgLabel.setText("File is compressed in: " + timeTaken + "ms" + System.lineSeparator() 
@@ -121,8 +123,6 @@ public class Compression {
 	public void decompress() {
 
 		fileChooser = new FileChooser();
-		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
-		fileChooser.getExtensionFilters().add(extFilter);
 		String currentPath = Paths.get(".").toAbsolutePath().normalize().toString() + "/src/resources";
 
 		fileChooser.setInitialDirectory(new File(currentPath));
@@ -143,7 +143,7 @@ public class Compression {
 			long start = System.currentTimeMillis();
 			controller.decompress(path, outputPath);
 			long end = System.currentTimeMillis();
-			long timeTaken = end - start;
+			timeTaken = end - start;
 			msgLabel.setTextFill(Color.WHITE);
 			msgLabel.setText("File is decompressed in: " + timeTaken + "ms");
 		}
