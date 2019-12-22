@@ -23,7 +23,7 @@ public class FrequencyCounter {
 		extension = "";
 		getExtension();
 	}
-	
+
 	private void getExtension() {
 		int index = filePath.lastIndexOf('.');
 		if (index > 0)
@@ -36,7 +36,7 @@ public class FrequencyCounter {
 		else
 			readBinaryFile();
 	}
-	
+
 	private void readTxtFile() {
 		try {
 			File file = new File(filePath);
@@ -60,15 +60,15 @@ public class FrequencyCounter {
 		}
 		return;
 	}
-	
+
 	private void readBinaryFile() {
 		try {
 			File file = new File(filePath);
 			fileSize = file.length();
 			byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
 			int numberOfBytes = fileBytes.length;
-			
-			for (int i = 0 ; i < numberOfBytes ; i++) {
+
+			for (int i = 0; i < numberOfBytes; i++) {
 				char character = (char) (fileBytes[i]);
 				fileContent.append(character);
 				if (!frequencies.containsKey(character)) {
@@ -94,6 +94,5 @@ public class FrequencyCounter {
 	public double getFileSize() {
 		return fileSize;
 	}
-
 
 }

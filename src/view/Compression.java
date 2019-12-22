@@ -32,11 +32,10 @@ public class Compression {
 	public Button compressButton;
 	public Button decompressButton;
 	String path;
-	
-	boolean isEmpty;
-	
-	private long timeTaken;
 
+	boolean isEmpty;
+
+	private long timeTaken;
 
 	public void initialize(Stage primaryStage) throws Exception {
 
@@ -77,11 +76,11 @@ public class Compression {
 			long end = System.currentTimeMillis();
 			timeTaken = end - start;
 			if (!isEmpty) {
-		        Alert alert = new Alert(AlertType.ERROR);
-		        alert.setContentText("Empty File"); 
-		        alert.show();
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setContentText("Empty File");
+				alert.show();
 			}
-				
+
 			refresh(path);
 			msgLabel.setTextFill(Color.WHITE);
 			msgLabel.setText("File loaded successfuly.");
@@ -107,15 +106,15 @@ public class Compression {
 			end = System.currentTimeMillis();
 			timeTaken = timeTaken + (end - start);
 			if (compressionRatio == -1) {
-		        Alert alert = new Alert(AlertType.ERROR);
-		        alert.setContentText("Input file is too small for compression"); 
-		        alert.show();
-		        return;
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setContentText("Input file is too small for compression");
+				alert.show();
+				return;
 			}
 			refresh(path);
 			msgLabel.setTextFill(Color.WHITE);
-			msgLabel.setText("File is compressed in: " + timeTaken + "ms" + System.lineSeparator() 
-			+ "Compression Ratio = " + compressionRatio);
+			msgLabel.setText("File is compressed in: " + timeTaken + "ms" + System.lineSeparator()
+					+ "Compression Ratio = " + compressionRatio);
 		}
 
 	}

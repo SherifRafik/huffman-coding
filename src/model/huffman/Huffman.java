@@ -171,7 +171,7 @@ public class Huffman {
 			for (Entry<Character, String> entry : codes.entrySet()) {
 				if (entry.getKey() == '\n' || entry.getKey() == '\r')
 					continue;
-				char character = (char)(entry.getKey());
+				char character = (char) (entry.getKey());
 				fout.write(character);
 				line = ": " + entry.getValue() + System.lineSeparator();
 				fout.write(line.getBytes(), 0, line.length());
